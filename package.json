@@ -1,0 +1,30 @@
+{
+  "name": "sealed-precision-oracle",
+  "version": "1.0.0",
+  "description": "Tamper-proof AI Oracle for precision prediction markets on 0G",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy": "hardhat run scripts/deploy.ts --network og_galileo",
+    "oracle": "ts-node src/oracle.ts",
+    "upload": "ts-node src/uploadReceipt.ts",
+    "test": "hardhat test"
+  },
+  "dependencies": {
+    "@0gfoundation/0g-compute-ts-sdk": "^0.8.3",
+    "@0gfoundation/0g-ts-sdk": "^1.2.8",
+    "@openzeppelin/contracts": "^5.1.0",
+    "dotenv": "^16.4.5",
+    "ethers": "6.13.1",
+    "openai": "^4.73.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.1.2",
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "chai": "^4.5.0",
+    "hardhat": "^2.22.17",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}

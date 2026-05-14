@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sealed Precision Oracle -- Tamper-Evident AI Oracle for Prediction Markets</title>
+<meta name="description" content="AI Oracle for precision prediction markets built on 0G's decentralized stack. TEE-attested inference, immutable receipts, on-chain verification.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --blue:#3B82F6;
+  --cyan:#22D3EE;
+  --bg-0:#08090C;
+  --bg-1:#0D0F14;
+  --bg-2:#12151C;
+  --bg-card:#151821;
+  --border:#1E2230;
+  --text-0:#E8EAF0;
+  --text-1:#A0A6B8;
+  --text-2:#6B7280;
+  --green:#34D399;
+  --amber:#FBBF24;
+  --font-sans:'Inter',system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono','SF Mono','Fira Code',monospace;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+  font-family:var(--font-sans);
+  background:var(--bg-0);
+  color:var(--text-0);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+
+/* ── Typography ─────────────────────────────────────────── */
+
+h1,h2,h3,h4{font-weight:700;line-height:1.2;letter-spacing:-0.02em}
+h2{font-size:clamp(1.5rem,3vw,2.25rem);margin-bottom:1rem}
+h3{font-size:1.125rem;margin-bottom:0.5rem}
+p{color:var(--text-1)}
+a{color:var(--blue);text-decoration:none;transition:color .15s}
+a:hover{color:var(--cyan)}
+code{font-family:var(--font-mono);font-size:0.875em}
+
+/* ── Layout ─────────────────────────────────────────────── */
+
+.container{max-width:1120px;margin:0 auto;padding:0 1.5rem}
+section{padding:6rem 0}
+.section-label{
+  font-family:var(--font-mono);
+  font-size:0.75rem;
+  font-weight:500;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--blue);
+  margin-bottom:0.75rem;
+  display:block;
+}
+
+/* ── Nav ────────────────────────────────────────────────── */
+
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(8,9,12,0.85);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+nav .container{
+  display:flex;align-items:center;justify-content:space-between;
+  height:56px;
+}
+.nav-mark{
+  font-weight:700;font-size:0.9375rem;
+  color:var(--text-0);
+  display:flex;align-items:center;gap:0.5rem;
+}
+.nav-mark span{
+  display:inline-block;
+  width:8px;height:8px;
+  background:var(--blue);
+  clip-path:polygon(50% 0%,100% 100%,0% 100%);
+}
+.nav-links{display:flex;gap:1.75rem;list-style:none}
+.nav-links a{font-size:0.8125rem;color:var(--text-2);font-weight:500;transition:color .15s}
+.nav-links a:hover{color:var(--text-0)}
+.nav-cta{
+  font-size:0.8125rem;font-weight:600;
+  color:var(--text-0);
+  padding:0.375rem 1rem;
+  border:1px solid var(--border);
+  background:transparent;
+  transition:border-color .2s,background .2s;
+}
+.nav-cta:hover{border-color:var(--blue);background:rgba(59,130,246,0.08)}
+
+@media(max-width:768px){
+  .nav-links{display:none}
+}
+
+/* ── Hero ───────────────────────────────────────────────── */
+
+.hero{
+  padding:10rem 0 6rem;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;
+  top:-200px;right:-200px;
+  width:600px;height:600px;
+  background:radial-gradient(circle,rgba(59,130,246,0.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-content{position:relative;max-width:720px}
+.hero-tag{
+  font-family:var(--font-mono);
+  font-size:0.75rem;
+  font-weight:500;
+  color:var(--blue);
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  display:inline-flex;
+  align-items:center;
+  gap:0.5rem;
+  margin-bottom:1.5rem;
+  padding:0.375rem 0.875rem;
+  border:1px solid rgba(59,130,246,0.2);
+  background:rgba(59,130,246,0.04);
+}
+.hero-tag::before{
+  content:'';display:inline-block;
+  width:6px;height:6px;
+  background:var(--blue);
+  border-radius:1px;
+}
+.hero h1{
+  font-size:clamp(2.5rem,5.5vw,4rem);
+  font-weight:800;
+  line-height:1.05;
+  letter-spacing:-0.03em;
+  margin-bottom:1.25rem;
+}
+.hero h1 .accent{color:var(--blue)}
+.hero-sub{
+  font-size:clamp(1.0625rem,2vw,1.25rem);
+  color:var(--text-1);
+  line-height:1.55;
+  margin-bottom:0.75rem;
+  max-width:600px;
+}
+.hero-stack{
+  font-size:0.875rem;
+  color:var(--text-2);
+  font-family:var(--font-mono);
+  margin-bottom:2.5rem;
+}
+.hero-stack strong{color:var(--text-1);font-weight:500}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  padding:0.75rem 1.5rem;
+  font-size:0.875rem;font-weight:600;
+  color:#fff;
+  background:var(--blue);
+  border:none;
+  font-family:var(--font-sans);
+  cursor:pointer;
+  transition:background .15s,transform .1s;
+}
+.btn-primary:hover{background:#2563EB;color:#fff}
+.btn-primary:active{transform:scale(0.98)}
+.btn-primary svg{width:16px;height:16px}
+.btn-secondary{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  padding:0.75rem 1.5rem;
+  font-size:0.875rem;font-weight:600;
+  color:var(--text-0);
+  background:transparent;
+  border:1px solid var(--border);
+  font-family:var(--font-sans);
+  cursor:pointer;
+  transition:border-color .2s,background .2s;
+}
+.btn-secondary:hover{border-color:var(--blue);background:rgba(59,130,246,0.06);color:var(--text-0)}
+
+/* ── Problem ────────────────────────────────────────────── */
+
+.problem{background:var(--bg-1);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.problem-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:2rem;
+  margin-top:2.5rem;
+}
+.problem-card{
+  padding:1.75rem;
+  border:1px solid var(--border);
+  background:var(--bg-card);
+  position:relative;
+}
+.problem-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,var(--blue),transparent);
+}
+.problem-card h3{color:var(--text-0);font-size:1rem;margin-bottom:0.625rem}
+.problem-card p{font-size:0.875rem;color:var(--text-2);line-height:1.6}
+
+@media(max-width:768px){
+  .problem-grid{grid-template-columns:1fr}
+}
+
+/* ── Architecture ───────────────────────────────────────── */
+
+.arch{position:relative}
+.pipeline{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  margin-top:2.5rem;
+  position:relative;
+}
+.pipeline::before{
+  content:'';position:absolute;
+  left:23px;top:24px;bottom:24px;
+  width:1px;
+  background:linear-gradient(to bottom,var(--blue),rgba(59,130,246,0.2),var(--blue));
+}
+.pipe-step{
+  display:flex;
+  align-items:flex-start;
+  gap:1.5rem;
+  padding:1.25rem 0;
+  position:relative;
+}
+.pipe-num{
+  flex-shrink:0;
+  width:48px;height:48px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);
+  font-size:0.8125rem;
+  font-weight:600;
+  color:var(--blue);
+  border:1px solid rgba(59,130,246,0.3);
+  background:var(--bg-0);
+  position:relative;
+  z-index:1;
+}
+.pipe-body{
+  flex:1;
+  padding:1.25rem 1.5rem;
+  border:1px solid var(--border);
+  background:var(--bg-card);
+}
+.pipe-body h3{font-size:0.9375rem;color:var(--text-0);margin-bottom:0.375rem}
+.pipe-body p{font-size:0.8125rem;color:var(--text-2);line-height:1.55}
+.pipe-body code{
+  font-size:0.75rem;
+  color:var(--cyan);
+  background:rgba(34,211,238,0.06);
+  padding:0.125rem 0.375rem;
+}
+
+@media(max-width:768px){
+  .pipe-step{flex-direction:column;gap:0.75rem;padding-left:0}
+  .pipeline::before{display:none}
+  .pipe-num{width:36px;height:36px;font-size:0.75rem}
+}
+
+/* ── Integrations ───────────────────────────────────────── */
+
+.integrations{background:var(--bg-1);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.int-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1px;
+  background:var(--border);
+  margin-top:2.5rem;
+  border:1px solid var(--border);
+}
+.int-card{
+  padding:2rem;
+  background:var(--bg-card);
+}
+.int-icon{
+  width:40px;height:40px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:1rem;
+  border:1px solid var(--border);
+  color:var(--blue);
+}
+.int-icon svg{width:20px;height:20px}
+.int-card h3{font-size:1rem;color:var(--text-0);margin-bottom:0.25rem}
+.int-card .int-sub{
+  font-family:var(--font-mono);
+  font-size:0.6875rem;
+  color:var(--blue);
+  margin-bottom:0.625rem;
+  letter-spacing:0.02em;
+}
+.int-card p{font-size:0.8125rem;color:var(--text-2);line-height:1.55}
+
+@media(max-width:768px){
+  .int-grid{grid-template-columns:1fr}
+}
+
+/* ── Transparency Table ────────────────────────────────── */
+
+.transparency{position:relative}
+.transparency-table{
+  width:100%;
+  margin-top:2.5rem;
+  border-collapse:collapse;
+  font-size:0.8125rem;
+}
+.transparency-table thead{
+  border-bottom:2px solid var(--border);
+}
+.transparency-table th{
+  text-align:left;
+  padding:0.875rem 1rem;
+  font-family:var(--font-mono);
+  font-size:0.6875rem;
+  font-weight:600;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--text-2);
+  background:var(--bg-1);
+}
+.transparency-table td{
+  padding:0.875rem 1rem;
+  border-bottom:1px solid var(--border);
+  color:var(--text-1);
+  vertical-align:top;
+}
+.transparency-table tr:last-child td{border-bottom:none}
+.transparency-table td:first-child{
+  font-weight:500;
+  color:var(--text-0);
+}
+.status{
+  font-family:var(--font-mono);
+  font-size:0.6875rem;
+  font-weight:600;
+  letter-spacing:0.04em;
+  padding:0.1875rem 0.5rem;
+  display:inline-block;
+}
+.status-real{color:var(--green);background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.15)}
+.status-simplified{color:var(--amber);background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.15)}
+.status-transparent{color:var(--cyan);background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.15)}
+
+@media(max-width:768px){
+  .transparency-table{font-size:0.75rem}
+  .transparency-table th,.transparency-table td{padding:0.625rem 0.625rem}
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+}
+
+/* ── Tech Stack ─────────────────────────────────────────── */
+
+.stack{background:var(--bg-1);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.stack-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1rem;
+  margin-top:2.5rem;
+}
+.stack-item{
+  padding:1.25rem;
+  border:1px solid var(--border);
+  background:var(--bg-card);
+}
+.stack-item .stack-label{
+  font-family:var(--font-mono);
+  font-size:0.6875rem;
+  font-weight:500;
+  color:var(--text-2);
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  margin-bottom:0.5rem;
+}
+.stack-item .stack-value{
+  font-size:0.9375rem;
+  font-weight:600;
+  color:var(--text-0);
+}
+.stack-item .stack-detail{
+  font-size:0.75rem;
+  color:var(--text-2);
+  margin-top:0.25rem;
+}
+
+@media(max-width:768px){
+  .stack-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+  .stack-grid{grid-template-columns:1fr}
+}
+
+/* ── Contracts ──────────────────────────────────────────── */
+
+.contracts-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem;
+  margin-top:2.5rem;
+}
+.contract-card{
+  padding:2rem;
+  border:1px solid var(--border);
+  background:var(--bg-card);
+  position:relative;
+}
+.contract-card h3{
+  font-family:var(--font-mono);
+  font-size:1rem;
+  color:var(--text-0);
+  margin-bottom:0.5rem;
+}
+.contract-card .contract-desc{
+  font-size:0.8125rem;
+  color:var(--text-2);
+  margin-bottom:1rem;
+  line-height:1.55;
+}
+.fn-list{list-style:none;display:flex;flex-direction:column;gap:0.375rem}
+.fn-list li{
+  font-family:var(--font-mono);
+  font-size:0.75rem;
+  color:var(--text-1);
+  padding:0.25rem 0;
+  border-bottom:1px solid rgba(30,34,48,0.5);
+}
+.fn-list li:last-child{border-bottom:none}
+.fn-list .fn-name{color:var(--cyan)}
+.fn-list .fn-tag{
+  font-size:0.625rem;
+  color:var(--text-2);
+  margin-left:0.5rem;
+  text-transform:uppercase;
+  letter-spacing:0.04em;
+}
+
+@media(max-width:768px){
+  .contracts-grid{grid-template-columns:1fr}
+}
+
+/* ── Quick Start ────────────────────────────────────────── */
+
+.quickstart{background:var(--bg-1);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.qs-steps{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem;
+  margin-top:2.5rem;
+}
+.qs-card{
+  padding:1.5rem;
+  border:1px solid var(--border);
+  background:var(--bg-card);
+}
+.qs-card h3{
+  font-size:0.875rem;
+  font-weight:600;
+  color:var(--text-0);
+  margin-bottom:0.75rem;
+  display:flex;align-items:center;gap:0.5rem;
+}
+.qs-card h3 .qs-num{
+  font-family:var(--font-mono);
+  font-size:0.6875rem;
+  color:var(--blue);
+  border:1px solid rgba(59,130,246,0.3);
+  width:24px;height:24px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+pre{
+  background:var(--bg-0);
+  border:1px solid var(--border);
+  padding:1rem;
+  overflow-x:auto;
+  font-family:var(--font-mono);
+  font-size:0.75rem;
+  line-height:1.7;
+  color:var(--text-1);
+  -webkit-overflow-scrolling:touch;
+}
+pre .comment{color:var(--text-2)}
+pre .cmd{color:var(--green)}
+pre .flag{color:var(--cyan)}
+
+@media(max-width:768px){
+  .qs-steps{grid-template-columns:1fr}
+}
+
+/* ── Footer ─────────────────────────────────────────────── */
+
+footer{
+  padding:3rem 0;
+  border-top:1px solid var(--border);
+}
+.footer-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:1rem;
+}
+.footer-text{font-size:0.8125rem;color:var(--text-2)}
+.footer-text strong{color:var(--text-1);font-weight:600}
+.footer-links{display:flex;gap:1.5rem;list-style:none}
+.footer-links a{
+  font-size:0.8125rem;
+  color:var(--text-2);
+  font-weight:500;
+  transition:color .15s;
+}
+.footer-links a:hover{color:var(--text-0)}
+
+/* ── Separator line ─────────────────────────────────────── */
+
+.sep{
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--border),transparent);
+  margin:0;
+}
+
+/* ── Animations ─────────────────────────────────────────── */
+
+@media(prefers-reduced-motion:no-preference){
+  .fade-in{
+    opacity:0;
+    transform:translateY(12px);
+    transition:opacity .5s ease,transform .5s ease;
+  }
+  .fade-in.visible{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* ── Selection ──────────────────────────────────────────── */
+
+::selection{background:rgba(59,130,246,0.25);color:#fff}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════ NAV -->
+<nav>
+  <div class="container">
+    <div class="nav-mark"><span></span> Sealed Precision Oracle</div>
+    <ul class="nav-links">
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#integrations">0G Stack</a></li>
+      <li><a href="#transparency">What's Real</a></li>
+      <li><a href="#contracts">Contracts</a></li>
+      <li><a href="#quickstart">Quick Start</a></li>
+    </ul>
+    <a href="https://github.com/YOUR_USERNAME/sealed-precision-oracle" class="nav-cta" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════════════════════ HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-content fade-in">
+      <div class="hero-tag">0G APAC Hackathon 2026 &mdash; Track 1: Agentic Infrastructure</div>
+      <h1>Sealed Precision<br><span class="accent">Oracle</span></h1>
+      <p class="hero-sub">Tamper-evident AI Oracle for precision prediction markets. Every inference is TEE-attested, every receipt is immutable, every proof is on-chain.</p>
+      <p class="hero-stack">Built on <strong>0G Compute</strong> + <strong>0G Storage</strong> + <strong>0G Chain</strong></p>
+      <div class="hero-actions">
+        <a href="https://github.com/YOUR_USERNAME/sealed-precision-oracle" class="btn-primary" target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          View on GitHub
+        </a>
+        <a href="#architecture" class="btn-secondary">See How It Works</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════ PROBLEM -->
+<section class="problem" id="problem">
+  <div class="container">
+    <span class="section-label fade-in">The Problem</span>
+    <h2 class="fade-in">Centralized AI oracles are black boxes</h2>
+    <p class="fade-in" style="max-width:640px">Today's AI oracles run behind closed APIs. No one can verify how the model reached its conclusion. The operator can manipulate inputs, cherry-pick outputs, or silently swap models. Prediction markets built on these oracles inherit all of that opacity.</p>
+    <div class="problem-grid">
+      <div class="problem-card fade-in">
+        <h3>Opaque Inference</h3>
+        <p>No cryptographic proof that the AI model actually ran inside a trusted environment. The operator could fabricate any response.</p>
+      </div>
+      <div class="problem-card fade-in">
+        <h3>Mutable Evidence</h3>
+        <p>Resolution receipts live on centralized servers. They can be edited, deleted, or retroactively altered without detection.</p>
+      </div>
+      <div class="problem-card fade-in">
+        <h3>No Accountability</h3>
+        <p>Without on-chain recording and verified identity, there is no audit trail. Disputes become he-said-she-said.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════ ARCHITECTURE -->
+<section class="arch" id="architecture">
+  <div class="container">
+    <span class="section-label fade-in">Architecture</span>
+    <h2 class="fade-in">Five-step atomic pipeline</h2>
+    <p class="fade-in" style="max-width:640px">Each oracle resolution flows through a deterministic pipeline. If any step fails, nothing is recorded. The receipt binds real data, AI reasoning, TEE attestation, and on-chain proof into a single verifiable artifact.</p>
+
+    <div class="pipeline">
+      <div class="pipe-step fade-in">
+        <div class="pipe-num">01</div>
+        <div class="pipe-body">
+          <h3>Real-Time Market Data</h3>
+          <p>Fetches live data from public sources &mdash; ETH gas prices from mainnet RPCs (<code>eth.llamarpc.com</code>), BTC/ETH/SOL prices from CoinGecko. No synthetic data. The raw JSON is hashed with <code>keccak256</code> for integrity binding.</p>
+        </div>
+      </div>
+
+      <div class="pipe-step fade-in">
+        <div class="pipe-num">02</div>
+        <div class="pipe-body">
+          <h3>TEE-Attested Inference</h3>
+          <p>Discovers TEE providers on-chain via 0G Compute SDK. Calls inference directly on the provider &mdash; not through the Router. The provider's TEE environment signs the response with its private key.</p>
+        </div>
+      </div>
+
+      <div class="pipe-step fade-in">
+        <div class="pipe-num">03</div>
+        <div class="pipe-body">
+          <h3>Per-Inference Signature Verification</h3>
+          <p>Fetches the provider's ECDSA signature for this specific chat. Recovers the signer via <code>ecrecover</code> and verifies it against the on-chain TEE signer address from the InferenceServing contract.</p>
+        </div>
+      </div>
+
+      <div class="pipe-step fade-in">
+        <div class="pipe-num">04</div>
+        <div class="pipe-body">
+          <h3>Immutable Receipt Upload</h3>
+          <p>The full receipt &mdash; AI response, real data, TEE signature, integrity hashes &mdash; is uploaded to 0G Storage as a Merkle tree. Returns a permanent root hash. The data cannot be altered after upload.</p>
+        </div>
+      </div>
+
+      <div class="pipe-step fade-in">
+        <div class="pipe-num">05</div>
+        <div class="pipe-body">
+          <h3>On-Chain Recording</h3>
+          <p>Calls <code>recordResolution()</code> on the ERC-7857 PrecisionOracleID contract. The storage root, TEE signature, and signer address are verified on-chain. The resolution is permanently linked to the agent's NFT identity.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════ INTEGRATIONS -->
+<section class="integrations" id="integrations">
+  <div class="container">
+    <span class="section-label fade-in">0G Integration Depth</span>
+    <h2 class="fade-in">Four layers of the 0G stack</h2>
+    <p class="fade-in" style="max-width:640px">Not surface-level usage. Each integration is structural &mdash; the oracle cannot function without it.</p>
+
+    <div class="int-grid">
+      <div class="int-card fade-in">
+        <div class="int-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>
+        </div>
+        <h3>0G Compute</h3>
+        <div class="int-sub">Direct provider inference, not just Router</div>
+        <p>On-chain provider discovery via InferenceServing contract. Direct TEE-attested inference calls to provider broker URLs. Per-inference ECDSA signature fetched and verified against on-chain signer.</p>
+      </div>
+
+      <div class="int-card fade-in">
+        <div class="int-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        </div>
+        <h3>0G Storage</h3>
+        <div class="int-sub">Merkle tree receipts, permanent and verifiable</div>
+        <p>Full resolution receipts uploaded as Merkle trees via the 0G TS SDK and Indexer. Returns a root hash that serves as the tamper-evident anchor. Anyone can download and verify the receipt.</p>
+      </div>
+
+      <div class="int-card fade-in">
+        <div class="int-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+        </div>
+        <h3>0G Chain</h3>
+        <div class="int-sub">ERC-7857 smart contracts, TEE signer registry</div>
+        <p>PrecisionOracleID implements the real ERC-7857 standard by 0G Labs. On-chain TEE signer registry with ECDSA proof verification. Atomic <code>recordResolution()</code> links storage roots to agent identity.</p>
+      </div>
+
+      <div class="int-card fade-in">
+        <div class="int-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </div>
+        <h3>OpenClaw</h3>
+        <div class="int-sub">SKILL.md skill manifest for agent orchestration</div>
+        <p>Full SKILL.md manifest enabling any OpenClaw-compatible agent to invoke the oracle as a composable skill. Defines inputs, outputs, and invocation protocol for agentic workflows.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════ TRANSPARENCY -->
+<section class="transparency" id="transparency">
+  <div class="container">
+    <span class="section-label fade-in">What's Real</span>
+    <h2 class="fade-in">Honest transparency report</h2>
+    <p class="fade-in" style="max-width:640px;margin-bottom:0">No inflated claims. Here is exactly what is real, what is simplified, and what is explicitly documented as a limitation.</p>
+
+    <div class="table-wrap">
+      <table class="transparency-table fade-in">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Status</th>
+            <th>Implementation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Real-time data</td>
+            <td><span class="status status-real">REAL</span></td>
+            <td>ETH gas from mainnet RPCs, BTC/ETH/SOL prices from CoinGecko</td>
+          </tr>
+          <tr>
+            <td>TEE attestation</td>
+            <td><span class="status status-real">REAL</span></td>
+            <td>Per-inference signature from provider, verified via <code>ecrecover</code></td>
+          </tr>
+          <tr>
+            <td>0G Storage</td>
+            <td><span class="status status-real">REAL</span></td>
+            <td>Actual Merkle tree upload via SDK, permanent root hash</td>
+          </tr>
+          <tr>
+            <td>On-chain recording</td>
+            <td><span class="status status-real">REAL</span></td>
+            <td>Atomic pipeline, ECDSA signature verified in contract</td>
+          </tr>
+          <tr>
+            <td>ERC-7857</td>
+            <td><span class="status status-real">REAL</span></td>
+            <td>Matches actual EIP-7857 by 0G Labs &mdash; iTransfer, iClone, authorizeUsage, delegateAccess</td>
+          </tr>
+          <tr>
+            <td>DataVerifier</td>
+            <td><span class="status status-simplified">SIMPLIFIED</span></td>
+            <td>ECDSA validation of transfer proofs, not full TEE/ZKP proof chain</td>
+          </tr>
+          <tr>
+            <td>Router fallback</td>
+            <td><span class="status status-transparent">TRANSPARENT</span></td>
+            <td>Explicit warning when TEE provider unavailable, receipt documents the fallback</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════ TECH STACK -->
+<section class="stack" id="stack">
+  <div class="container">
+    <span class="section-label fade-in">Tech Stack</span>
+    <h2 class="fade-in">Built with production tooling</h2>
+
+    <div class="stack-grid">
+      <div class="stack-item fade-in">
+        <div class="stack-label">Smart Contracts</div>
+        <div class="stack-value">Solidity 0.8.27</div>
+        <div class="stack-detail">Cancun EVM target</div>
+      </div>
+      <div class="stack-item fade-in">
+        <div class="stack-label">Runtime</div>
+        <div class="stack-value">TypeScript</div>
+        <div class="stack-detail">ethers.js 6, Node 20</div>
+      </div>
+      <div class="stack-item fade-in">
+        <div class="stack-label">0G SDKs</div>
+        <div class="stack-value">0g-ts-sdk + 0g-compute-ts-sdk</div>
+        <div class="stack-detail">@0gfoundation packages</div>
+      </div>
+      <div class="stack-item fade-in">
+        <div class="stack-label">Contract Framework</div>
+        <div class="stack-value">OpenZeppelin v5</div>
+        <div class="stack-detail">ERC-721, ECDSA, EnumerableSet</div>
+      </div>
+      <div class="stack-item fade-in">
+        <div class="stack-label">Dev & Test</div>
+        <div class="stack-value">Hardhat</div>
+        <div class="stack-detail">27 passing tests</div>
+      </div>
+      <div class="stack-item fade-in">
+        <div class="stack-label">Network</div>
+        <div class="stack-value">0G Galileo Testnet</div>
+        <div class="stack-detail">Chain ID 16601</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════ CONTRACTS -->
+<section class="contracts" id="contracts">
+  <div class="container">
+    <span class="section-label fade-in">Contracts</span>
+    <h2 class="fade-in">Two contracts, deployed on Galileo</h2>
+
+    <div class="contracts-grid">
+      <div class="contract-card fade-in">
+        <h3>OracleDataVerifier</h3>
+        <p class="contract-desc">ERC-7857 DataVerifier. Validates ECDSA signatures in transfer proofs &mdash; recovers signers via <code>ecrecover</code> and ensures access/ownership proof consistency.</p>
+        <ul class="fn-list">
+          <li><span class="fn-name">verifyTransferValidity()</span><span class="fn-tag">erc-7857</span></li>
+          <li style="color:var(--text-2);font-size:0.6875rem;border:none;padding-top:0.5rem">
+            Validates: non-zero hashes, proof agreement, 65-byte ECDSA signatures, signer matching
+          </li>
+        </ul>
+      </div>
+
+      <div class="contract-card fade-in">
+        <h3>PrecisionOracleID</h3>
+        <p class="contract-desc">ERC-721 + ERC-7857 agent identity. Maps each oracle agent to its resolution history on 0G Storage. TEE signer registry for on-chain attestation verification.</p>
+        <ul class="fn-list">
+          <li><span class="fn-name">recordResolution()</span><span class="fn-tag">oracle</span></li>
+          <li><span class="fn-name">registerTeeSigner()</span><span class="fn-tag">tee</span></li>
+          <li><span class="fn-name">iTransfer()</span><span class="fn-tag">erc-7857</span></li>
+          <li><span class="fn-name">iClone()</span><span class="fn-tag">erc-7857</span></li>
+          <li><span class="fn-name">authorizeUsage()</span><span class="fn-tag">erc-7857</span></li>
+          <li><span class="fn-name">intelligentDataOf()</span><span class="fn-tag">erc-7857</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════ QUICK START -->
+<section class="quickstart" id="quickstart">
+  <div class="container">
+    <span class="section-label fade-in">Quick Start</span>
+    <h2 class="fade-in">Deploy and run in four steps</h2>
+
+    <div class="qs-steps">
+      <div class="qs-card fade-in">
+        <h3><span class="qs-num">1</span>Install</h3>
+        <pre><span class="cmd">git clone</span> https://github.com/YOUR_USERNAME/sealed-precision-oracle
+<span class="cmd">cd</span> oracle
+<span class="cmd">nvm use</span>  <span class="comment"># Node 20.17.0</span>
+<span class="cmd">npm install</span> <span class="flag">--legacy-peer-deps</span></pre>
+      </div>
+
+      <div class="qs-card fade-in">
+        <h3><span class="qs-num">2</span>Configure</h3>
+        <pre><span class="cmd">cp</span> .env.example .env
+<span class="comment"># Add your private key</span>
+<span class="comment"># Get testnet tokens:</span>
+<span class="comment"># cloud.google.com/application/web3/faucet/0g/galileo</span></pre>
+      </div>
+
+      <div class="qs-card fade-in">
+        <h3><span class="qs-num">3</span>Deploy</h3>
+        <pre><span class="cmd">npm run</span> compile
+<span class="cmd">npm run</span> deploy
+<span class="comment"># Deploys OracleDataVerifier + PrecisionOracleID</span>
+<span class="comment"># Copy ORACLE_CONTRACT_ADDRESS to .env</span></pre>
+      </div>
+
+      <div class="qs-card fade-in">
+        <h3><span class="qs-num">4</span>Run</h3>
+        <pre><span class="cmd">npm run</span> oracle
+<span class="comment"># or with a custom question:</span>
+<span class="cmd">npx ts-node</span> src/oracle.ts <span class="flag">\</span>
+  <span class="flag">"Will ETH gas exceed 30 gwei?"</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════ FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-text">
+        Built for <strong>0G APAC Hackathon 2026</strong> &nbsp;|&nbsp; Track 1: Agentic Infrastructure
+      </div>
+      <ul class="footer-links">
+        <li><a href="https://github.com/YOUR_USERNAME/sealed-precision-oracle" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="https://0g.ai" target="_blank" rel="noopener">0G Network</a></li>
+        <li><a href="https://chainscan-galileo.0g.ai" target="_blank" rel="noopener">Explorer</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<!-- ════════════════════════════════════════════════════════ JS -->
+<script>
+// Intersection Observer for fade-in animations
+(function(){
+  const els = document.querySelectorAll('.fade-in');
+  if (!('IntersectionObserver' in window)) {
+    els.forEach(el => el.classList.add('visible'));
+    return;
+  }
+  const obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  els.forEach(function(el) { obs.observe(el); });
+})();
+
+// Smooth scroll for anchor links (fallback for older browsers)
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    var target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+
+</body>
+</html>
