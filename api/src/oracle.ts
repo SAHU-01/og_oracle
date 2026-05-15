@@ -53,50 +53,6 @@ async function main() {
   const tokenId = parseInt(process.env.ORACLE_TOKEN_ID || "1", 10);
 
   console.log("=== Sealed Precision Oracle v3.0 ===\n");
-
-  const PRIVATE_KEY = process.env.PRIVATE_KEY;
-  const REMOTE_API_URL = process.env.REMOTE_API_URL || "http://localhost:3001";
-
-  if (!PRIVATE_KEY) {
-    console.log("No PRIVATE_KEY found in .env. Attempting to use Managed API Bridge...");
-    try {
-      const response = await fetch(`${REMOTE_API_URL}/api/resolve`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ marketQuestion }),
-      });
-      
-      const result: any = await response.json();
-      if (!result.success) throw new Error(result.error);
-
-      console.log(`AI Resolution:\n \`\`\`json\n${JSON.stringify({
-        market_question: marketQuestion,
-        resolution: result.resolution,
-        confidence: result.confidence,
-        reasoning: result.reasoning,
-        data_used: result.data_used.dataPoints,
-        timestamp: new Date().toISOString()
-      }, null, 2)}\n\`\`\``);
-
-      console.log("\n" + "=".repeat(56));
-      console.log("  SEALED PRECISION ORACLE — RESOLUTION COMPLETE (via API)");
-      console.log("=".repeat(56) + "\n");
-      console.log("Market Question:", marketQuestion);
-      console.log("TEE Attestation: VERIFIED (via Remote TEE Signer)");
-      console.log("  Signer:       ", result.proofs.teeSigner);
-      console.log("\n0G Storage Root:", result.proofs.storageRoot);
-      if (result.proofs.onChainTx !== "0x") {
-        console.log("0G Chain TX:    ", result.proofs.onChainTx);
-        console.log("Explorer:        https://chainscan.0g.ai/tx/" + result.proofs.onChainTx);
-      }
-      return;
-    } catch (err: any) {
-      console.error("Managed API fallback failed:", err.message);
-      console.log("Please set PRIVATE_KEY in .env to run locally.");
-      process.exit(1);
-    }
-  }
-
   console.log("Contract Address:", contractAddress);
   console.log("Market Question:", marketQuestion);
 

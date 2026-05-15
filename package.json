@@ -2,7 +2,20 @@
   "name": "sealed-precision-oracle",
   "version": "1.0.0",
   "description": "Tamper-proof AI Oracle for precision prediction markets on 0G",
+  "main": "dist/src/oracle.js",
+  "bin": {
+    "sealed-precision-oracle": "bin/cli.js"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "skills",
+    "contracts",
+    "src"
+  ],
   "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
     "compile": "hardhat compile",
     "deploy": "hardhat run scripts/deploy.ts --network og_galileo",
     "oracle": "ts-node src/oracle.ts",

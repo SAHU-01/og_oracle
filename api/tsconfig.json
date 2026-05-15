@@ -8,9 +8,8 @@
     "resolveJsonModule": true,
     "outDir": "dist",
     "declaration": true,
-    "sourceMap": true,
-    "skipLibCheck": true
+    "sourceMap": true
   },
-  "include": ["src/**/*", "scripts/**/*", "hardhat.config.ts"],
-  "exclude": ["node_modules", "artifacts", "cache"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }
