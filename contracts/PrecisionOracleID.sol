@@ -99,11 +99,13 @@ contract PrecisionOracleID is ERC721, Ownable, IERC7857, IERC7857Metadata {
     ///         Callable by token owner OR authorized users.
     /// @param tokenId The Oracle agent token
     /// @param storageRoot 0G Storage Merkle root hash of the receipt
-    /// @param teeSignature The TEE's ECDSA signature over the AI response (empty = unattested)
+    /// @param signedText The raw text that the TEE signed
+    /// @param teeSignature The TEE's ECDSA signature over the signedText
     /// @param teeSigner The TEE signer address to verify against (zero = skip verification)
     function recordResolution(
         uint256 tokenId,
         bytes32 storageRoot,
+        string calldata signedText,
         bytes calldata teeSignature,
         address teeSigner
     ) external {
@@ -114,8 +116,8 @@ contract PrecisionOracleID is ERC721, Ownable, IERC7857, IERC7857Metadata {
         if (teeSignature.length > 0 && teeSigner != address(0)) {
             require(registeredTeeSigners[teeSigner], "TEE signer not registered");
 
-            // Recover signer from the signature over storageRoot
-            bytes32 ethSignedHash = storageRoot.toEthSignedMessageHash();
+            // Recover signer from the signature over the raw signed text
+            bytes32 ethSignedHash = MessageHashUtils.toEthSignedMessageHash(bytes(signedText));
             address recovered = ethSignedHash.recover(teeSignature);
             require(recovered == teeSigner, "TEE signature verification failed");
         }

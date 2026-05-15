@@ -15,7 +15,7 @@ import {
   createZGComputeNetworkBroker,
   createZGComputeNetworkReadOnlyBroker,
 } from "@0gfoundation/0g-compute-ts-sdk";
-import OpenAI from "openai";
+import { OpenAI } from "openai";
 import "dotenv/config";
 
 const OG_RPC_URL = process.env.OG_RPC_URL || "https://evmrpc-testnet.0g.ai";

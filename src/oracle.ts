@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
-import { uploadReceipt } from "./uploadReceipt.js";
-import { fetchMarketData, formatMarketDataForPrompt, type MarketData } from "./fetchMarketData.js";
-import { teeInference, discoverProviders, type TeeInferenceResult } from "./teeInference.js";
+import { uploadReceipt } from "./uploadReceipt";
+import { fetchMarketData, formatMarketDataForPrompt, type MarketData } from "./fetchMarketData";
+import { teeInference, discoverProviders, type TeeInferenceResult } from "./teeInference";
 import "dotenv/config";
 
 // ─── Configuration ──────────────────────────────────────────────────────────
@@ -10,7 +10,7 @@ const OG_RPC_URL = process.env.OG_RPC_URL || "https://evmrpc-testnet.0g.ai";
 
 // Contract ABI (only the functions we need)
 const ORACLE_ABI = [
-  "function recordResolution(uint256 tokenId, bytes32 storageRoot, bytes teeSignature, address teeSigner) external",
+  "function recordResolution(uint256 tokenId, bytes32 storageRoot, string calldata signedText, bytes calldata teeSignature, address teeSigner) external",
   "function resolutionCount(uint256 tokenId) external view returns (uint256)",
 ];
 
@@ -53,6 +53,7 @@ async function main() {
   const tokenId = parseInt(process.env.ORACLE_TOKEN_ID || "1", 10);
 
   console.log("=== Sealed Precision Oracle v3.0 ===\n");
+  console.log("Contract Address:", contractAddress);
   console.log("Market Question:", marketQuestion);
 
   // ── Step 1: Fetch real market data ───────────────────────────────────
@@ -88,7 +89,7 @@ async function main() {
     console.warn("[TEE] Reason:", err.message);
 
     // Fallback to Router if no direct providers available
-    const OpenAI = (await import("openai")).default;
+    const { OpenAI } = await import("openai");
     const client = new OpenAI({
       baseURL: "https://router-api.0g.ai/v1",
       apiKey: process.env.ZG_API_KEY || "not-needed-for-testnet",
@@ -189,6 +190,7 @@ async function main() {
     const rootHashBytes32 = ethers.zeroPadValue(rootHash, 32);
 
     // Pass TEE signature and signer for on-chain verification
+    const signedText = inferenceResult.attestation?.signedText || "";
     const teeSignature = inferenceResult.attestation?.signature
       ? inferenceResult.attestation.signature
       : "0x";
@@ -199,6 +201,7 @@ async function main() {
     const tx = await contract.recordResolution(
       tokenId,
       rootHashBytes32,
+      signedText,
       teeSignature,
       teeSigner
     );
@@ -206,6 +209,11 @@ async function main() {
     chainTxHash = receiptTx?.hash || tx.hash;
 
     const count = await contract.resolutionCount(tokenId);
+    const chainId = (await provider.getNetwork()).chainId;
+    const explorerBase = chainId === 16661n 
+      ? "https://chainscan.0g.ai/tx/" 
+      : "https://chainscan-galileo.0g.ai/tx/";
+
     console.log("  On-chain TX:", chainTxHash);
     console.log("  Total resolutions for token", tokenId + ":", count.toString());
   } else {
@@ -236,8 +244,10 @@ async function main() {
   console.log("\n0G Storage Root:", rootHash);
   console.log("0G Storage TX:  ", txHash);
   if (chainTxHash) {
+    const chainId = (await new ethers.JsonRpcProvider(OG_RPC_URL).getNetwork()).chainId;
+    const explorerBase = chainId === 16661n ? "https://chainscan.0g.ai/tx/" : "https://chainscan-galileo.0g.ai/tx/";
     console.log("0G Chain TX:    ", chainTxHash);
-    console.log("Explorer:        https://chainscan-galileo.0g.ai/tx/" + chainTxHash);
+    console.log("Explorer:        " + explorerBase + chainTxHash);
   }
   console.log(
     "\nVerification: Download the receipt from 0G Storage using the root hash."
