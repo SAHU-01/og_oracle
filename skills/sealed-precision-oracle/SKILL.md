@@ -1,7 +1,7 @@
 ---
 name: sealed-precision-oracle
 description: Cognitive backbone for verifiable market resolutions. Uses TEE-attested AI inference (0G Compute), long-context state persistence (0G Storage), and ERC-7857 agent identity (0G Chain).
-metadata: {"openclaw":{"emoji":"🔮","track":"Track 1: Agentic Infrastructure","requires":{"bins":["node","npx"],"env":["PRIVATE_KEY","ORACLE_CONTRACT_ADDRESS"],"os":["darwin","linux"]},"primaryEnv":"PRIVATE_KEY"}}
+metadata: {"openclaw":{"emoji":"🔮","track":"Track 1: Agentic Infrastructure","requires":{"bins":["node","npx"],"env":["ORACLE_CONTRACT_ADDRESS"],"os":["darwin","linux"]},"optionalEnv":["PRIVATE_KEY"]}}
 ---
 
 # Sealed Precision Oracle (Track 1: Agentic Infrastructure)
@@ -21,30 +21,40 @@ Resolves complex, data-dependent questions using a multi-layered verifiable pipe
 
 ## Integration with OpenClaw
 
-This Oracle is designed to be orchestrated by OpenClaw. Agents can utilize this skill to:
-- Resolve prediction market outcomes.
-- Make risk-management decisions based on verifiable network data.
-- Maintain a permanent, auditable log of AI-driven events.
+This Oracle is designed to be orchestrated by OpenClaw. It supports two execution modes:
+
+1.  **Managed Mode (Default/Zero-Config):** Ideal for judges and rapid demos. If no local private key is found, the skill automatically calls a hosted **API Bridge** that handles 0G fees and transaction signing using our infrastructure.
+2.  **Autonomous Mode (Self-Sovereign):** If you provide a funded `PRIVATE_KEY`, the skill runs entirely on your local machine, using your own funds for 0G Compute, 0G Storage, and 0G Chain recording.
 
 ## Workflow
 
 1. Trigger the oracle via ClawHub or CLI:
    ```bash
-   sealed-precision-oracle "<market question>"
+   # Managed Mode (Zero-Config)
+   sealed-precision-oracle "Is ETH gas below 30 gwei?"
+
+   # Autonomous Mode (Local Signing)
+   export PRIVATE_KEY="your_funded_key"
+   sealed-precision-oracle "Is ETH gas below 30 gwei?"
    ```
 2. The pipeline handles:
    - Real-time data injection.
-   - TEE inference and signature verification.
-   - 0G Storage archival.
-   - 0G Chain recording.
+   - TEE-attested AI inference.
+   - 0G Storage state archival.
+   - 0G Mainnet settlement.
 3. Report the verified resolution and cryptographic proofs.
 
 ## Prerequisites
 
-1. Set `PRIVATE_KEY` in `.env`.
-2. Fund your **0G Compute Ledger** (min 3.0 0G).
-3. Deploy the contracts or use the existing ones:
-   - Mainnet: `0xf25E765eF573c26d6314Fd83822564E7AF11C9Ac`
+- **Managed Mode:** No prerequisites! Just install and run.
+- **Autonomous Mode:** 
+  1. Export `PRIVATE_KEY` in your terminal or create a `.env` file locally.
+  2. Ensure your wallet has **0G Tokens** for gas and storage fees.
+  3. The skill automatically handles Compute Ledger funding and TEE handshakes.
+
+## Mainnet Addresses
+- **Oracle ID (ERC-7857):** `0xf25E765eF573c26d6314Fd83822564E7AF11C9Ac`
+- **Network:** 0G Mainnet (Chain ID: 16661)
 
 ## Guardrails
 

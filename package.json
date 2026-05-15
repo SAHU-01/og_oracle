@@ -17,7 +17,8 @@
     "build": "tsc",
     "prepublishOnly": "npm run build",
     "compile": "hardhat compile",
-    "deploy": "hardhat run scripts/deploy.ts --network og_galileo",
+    "deploy": "hardhat run scripts/deploy.ts --network og_mainnet",
+    "deploy:testnet": "hardhat run scripts/deploy.ts --network og_galileo",
     "oracle": "ts-node src/oracle.ts",
     "upload": "ts-node src/uploadReceipt.ts",
     "test": "hardhat test"

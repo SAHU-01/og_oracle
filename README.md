@@ -66,32 +66,41 @@ This project implements a complete cognitive layer for agents, ensuring every de
 | TEE Attestation | **REAL** | **Per-inference ECDSA signatures** verified against on-chain TEE signers. |
 | 0G Storage | **REAL** | Receipts archived on Mainnet Turbo Indexer. |
 | On-chain Settlement| **REAL** | Resolutions recorded on 0G Mainnet via ERC-7857 contracts. |
-| Web UI | **REAL** | Modern React dashboard for user-triggered resolutions. |
 
 ## 🛠️ Usage
 
-### 1. Web Dashboard (Recommended for Demo)
-Experience the full verifiable flow at a glance:
-- **Frontend**: [http://localhost:5173](http://localhost:5173)
-- **Backend**: [http://localhost:3001](http://localhost:3001)
-
-### 2. CLI Execution
+### 1. Zero-Config Demo (Recommended for Judges)
+Experience the full verifiable flow instantly without any setup. Our hosted API bridge handles the 0G gas and storage fees for you.
 ```bash
-# Set your PRIVATE_KEY in .env
-npm run oracle "Is the price of Solana above $200?"
+# Install globally
+npm install -g sealed-precision-oracle
+
+# Run instantly (Managed Mode)
+sealed-precision-oracle "Is the price of Solana above $200?"
+```
+
+### 2. Autonomous Mode (For Advanced Agents)
+Run the entire pipeline on your own hardware using your own 0G funds.
+```bash
+# Set your PRIVATE_KEY in your environment
+export PRIVATE_KEY="0x..."
+
+# Run locally (Autonomous Mode)
+sealed-precision-oracle "Is the price of Solana above $200?"
 ```
 
 ### 3. Smart Contract Integration
 The oracle records proofs to:
 - **Mainnet Address**: `0xf25E765eF573c26d6314Fd83822564E7AF11C9Ac`
+- **Network**: 0G Mainnet (Chain ID: 16661)
 
 ## 📂 Project Structure
 
 - `contracts/`: ERC-7857 compliant smart contracts for AI agent identity.
 - `src/`: Core logic for data fetching, TEE inference, and storage.
-- `web/`: 0G-themed React dashboard (Vite + Tailwind).
-- `api/`: Backend bridge for secure TEE execution.
+- `api/`: Backend bridge for secure TEE execution (Managed Mode).
 - `skills/`: OpenClaw skill manifest for ClawHub publication.
+- `bin/`: CLI entry point for global installation.
 
 ## 🏁 Track 1 Alignment
 This project serves as a foundational **Cognitive Backbone** for agentic infrastructure. By combining real-time data ingestion with TEE-secured reasoning and 0G Storage state persistence, it creates an autonomous intelligence layer that is inherently trustworthy and fully auditable on-chain.

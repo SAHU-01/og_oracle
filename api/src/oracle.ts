@@ -6,7 +6,7 @@ import "dotenv/config";
 
 // ─── Configuration ──────────────────────────────────────────────────────────
 
-const OG_RPC_URL = process.env.OG_RPC_URL || "https://evmrpc-testnet.0g.ai";
+const OG_RPC_URL = process.env.OG_RPC_URL || "https://evmrpc.0g.ai";
 
 // Contract ABI (only the functions we need)
 const ORACLE_ABI = [

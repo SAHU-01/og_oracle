@@ -70,7 +70,7 @@ app.post("/api/resolve", async (req, res) => {
 
     // 4. Record on 0G Chain (On-chain settlement)
     console.log("[4/4] Recording resolution on 0G Chain...");
-    const OG_RPC_URL = process.env.OG_RPC_URL || "https://evmrpc-testnet.0g.ai";
+    const OG_RPC_URL = process.env.OG_RPC_URL || "https://evmrpc.0g.ai";
     const PRIVATE_KEY = process.env.PRIVATE_KEY;
     const ORACLE_CONTRACT_ADDRESS = process.env.ORACLE_CONTRACT_ADDRESS || "0xf25E765eF573c26d6314Fd83822564E7AF11C9Ac";
 

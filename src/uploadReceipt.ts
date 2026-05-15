@@ -5,10 +5,10 @@ import * as path from "path";
 import * as os from "os";
 import "dotenv/config";
 
-const OG_RPC_URL = process.env.OG_RPC_URL || "https://evmrpc-testnet.0g.ai";
+const OG_RPC_URL = process.env.OG_RPC_URL || "https://evmrpc.0g.ai";
 const OG_INDEXER_RPC =
   process.env.OG_INDEXER_RPC ||
-  "https://indexer-storage-testnet-turbo.0g.ai";
+  "https://indexer-storage-mainnet-turbo.0g.ai";
 
 export interface UploadResult {
   rootHash: string;

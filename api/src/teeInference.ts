@@ -18,7 +18,7 @@ import {
 import { OpenAI } from "openai";
 import "dotenv/config";
 
-const OG_RPC_URL = process.env.OG_RPC_URL || "https://evmrpc-testnet.0g.ai";
+const OG_RPC_URL = process.env.OG_RPC_URL || "https://evmrpc.0g.ai";
 
 export interface TeeAttestation {
   signedText: string;
