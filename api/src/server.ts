@@ -41,13 +41,23 @@ app.post("/api/resolve", async (req, res) => {
     }
 
     // Parse the AI response (it's expected to be a JSON string inside the content)
-    let resolutionData;
+    let resolutionData: { resolution: string; reasoning: string; confidence: number };
     try {
       const jsonMatch = inferenceResult.content.match(/\{[\s\S]*\}/);
-      resolutionData = JSON.parse(jsonMatch ? jsonMatch[0] : inferenceResult.content);
+      if (jsonMatch) {
+        resolutionData = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error("No JSON found in response");
+      }
     } catch (e) {
-      console.warn("Failed to parse AI response as JSON, using raw content.");
-      resolutionData = { resolution: "ERROR", reasoning: inferenceResult.content, confidence: 0 };
+      console.warn("Failed to parse AI response as JSON, using keyword fallback.");
+      const upperContent = inferenceResult.content.toUpperCase();
+      const resolution = upperContent.includes("YES") ? "YES" : (upperContent.includes("NO") ? "NO" : "UNKNOWN");
+      resolutionData = { 
+        resolution, 
+        reasoning: inferenceResult.content, 
+        confidence: 0 
+      };
     }
 
     // 3. Upload to 0G Storage
