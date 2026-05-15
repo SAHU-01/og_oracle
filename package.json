@@ -24,12 +24,12 @@
     "test": "hardhat test"
   },
   "dependencies": {
-    "@0gfoundation/0g-compute-ts-sdk": "^0.8.3",
-    "@0gfoundation/0g-ts-sdk": "^1.2.8",
+    "@0gfoundation/0g-compute-ts-sdk": "0.8.3",
+    "@0gfoundation/0g-ts-sdk": "1.2.8",
     "@openzeppelin/contracts": "^5.1.0",
     "dotenv": "^16.4.5",
     "ethers": "6.13.1",
-    "openai": "^4.73.0"
+    "openai": "6.37.0"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.1.2",
